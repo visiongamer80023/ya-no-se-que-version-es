@@ -1,0 +1,77 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #E4E4E4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+form {
+    background-color: #F5F5F5;
+    padding: 50px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+form h2 {
+    font-size: 25px;
+    color: #1E1E1E;
+    text-transform: uppercase;
+    margin-bottom: 35px;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 15px 15px 15px 55px;
+    border: 1px solid #ccc;
+    outline: none;
+    border-radius: 25px;
+}
+
+/* Íconos */
+.input-container{
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-container input{
+    width: 100%;
+    padding: 15px 15px 15px 60px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    font-size: 16px;
+}
+
+.icono{
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+
+/* Colores de cada icono */
+.fa-user{
+    color: #3498db;
+}
+
+.fa-lock{
+    color: #e74c3c;
+}
+
+.fa-envelope{
+    color: #2ecc71;
+}

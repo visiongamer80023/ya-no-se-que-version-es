@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+    <style>
+                /* Estilos CSS para simular la apariencia de un foro */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #DAE0E6; /* Color de fondo claro */
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #FFFFFF; /* Barra superior blanca */
+            padding: 10px 20px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #FF4500; /* Color de Reddit */
+            margin: 0 20px 0 0;
+           /* margin-right: 20px;*/
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin:  auto; /*   no es necesario es 20px*/
+            display: flex;
+            gap: 20px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Área de envío de mensajes */
+        .post-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .post-form button {
+            background-color: #0079D3; /* Botón azul */
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .post-form button:hover {
+            background-color: #0066AA;
+        }
+
+        /* Estilo de los posts */
+        .post {
+            background-color: #FFFFFF;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+        }
+        
+        /* Estilo especial para el post de la IA */
+        .post.ai-post {
+            border-left: 5px solid #0079D3; /* Borde de color para distinguirlo */
+            background-color: #F8F8FF; /* Fondo ligeramente diferente */
+        }
+
+        .post-content {
+            flex-grow: 1;
+        }
+
+        .post h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .post p {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+            white-space: pre-wrap; /* Mantiene saltos de línea y espacios */
+        }
+
+        .post-meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Votos (flechas) */
+        .votes {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 15px;
+            color: #C6C6C6;
+            font-weight: bold;
+        }
+
+        .vote-arrow {
+            font-size: 20px;
+            cursor: pointer;
+            color: #A9A9A9;
+            user-select: none;
+        }
+
+        .vote-arrow:hover {
+            color: #FF4500;
+        }
+
+        .sidebar {
+            width: 300px;
+            max-height: 200px;
+            background-color: #FFFFFF;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: #FF4500;
+            border-bottom: 1px solid #FF4500;
+            padding-bottom: 5px;
+        }
+
+        /* Animación del cursor de escritura */
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .typing-indicator {
+            display: inline-block;
+            margin-left: 5px;
+            font-weight: bold;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+            color: #0079D3;
+        }
+        .typing-indicator span {
+            animation: blink 1s infinite;
+        }
+        .typing-indicator .dot1 { animation-delay: 0s; }
+        .typing-indicator .dot2 { animation-delay: 0.2s; }
+        .typing-indicator .dot3 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>r/Simulacion</h1>
+        <p>Un foro de demostración</p>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <h2>Crear un nuevo Post</h2>
+            <div class="post-form">
+                <textarea id="postInput" placeholder="Escribe tu mensaje o hazle una pregunta a la IA..." rows="4"></textarea>
+                <button onclick="submitPost()">Publicar</button>
+            </div>
+
+            <hr>
+
+            <h2>Posts Recientes</h2>
+            <div id="postsContainer">
+                </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>🤖 Mini-IA de Prueba</h3>
+            <p>Puedes preguntarle cosas básicas como:</p>
+            <ul>
+                <li>¿Qué eres?</li>
+                <li>¿Quién te creó?</li>
+                <li>¿Cómo estás?</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const postsContainer = document.getElementById('postsContainer');
+        const postInput = document.getElementById('postInput');
+        const aiName = 'Mini-IA 🤖';
+        const userName = 'Usuario anónimo';
+
+        // Respuestas de la Mini-IA (Base de conocimiento simple)
+        const aiResponses = {
+            'que eres': 'Soy una Mini-IA de prueba programada en JavaScript para responder preguntas básicas en este foro de demostración.',
+            'quien te creo': 'Fui creada por el desarrollador de esta página usando código simple de JavaScript.',
+            'como estas': 'Estoy bien, gracias por preguntar. Siempre lista para procesar información.',
+            'hola': '¡Hola! ¿En qué puedo ayudarte hoy?',
+            'adios': '¡Hasta pronto! Espero verte de nuevo por aquí.',
+            'clima': 'No tengo acceso a datos en tiempo real, ¡soy solo una IA de demostración!',
+            'hora': `La hora actual (simulada) es ${new Date().toLocaleTimeString()}.`,
+            'color': 'Mi color favorito es el azul del código.',
+        };
+
+        // --- Nuevas Funcionalidades ---
+
+        /**
+         * 1. Habilitar Envío al presionar ENTER (sin CTRL/SHIFT)
+         */
+        postInput.addEventListener('keydown', function(event) {
+            // Verifica si la tecla presionada es Enter (código 13 o 'Enter')
+            // y que las teclas Shift o Ctrl NO estén presionadas (para permitir saltos de línea)
+            if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
+                event.preventDefault(); // Previene el salto de línea por defecto
+                submitPost();
+            }
+        });
+        
+        /**
+         * Función para verificar si el post contiene una pregunta para la IA
+         */
+        function checkAI(text) {
+            const lowerText = text.toLowerCase();
+            for (const keyword in aiResponses) {
+                if (lowerText.includes(keyword)) {
+                    return aiResponses[keyword];
+                }
+            }
+            if (lowerText.startsWith('que ') || lowerText.startsWith('quien ') || lowerText.startsWith('como ') || lowerText.startsWith('cuando ')) {
+                return 'Esa es una buena pregunta, pero no está en mi base de conocimiento. Por favor, intenta con las preguntas sugeridas en la barra lateral.';
+            }
+            return null;
+        }
+
+        /**
+         * Función para crear un elemento de post en el DOM
+         */
+        function createPostElement(content, author) {
+            const postDiv = document.createElement('div');
+            postDiv.classList.add('post');
+            if (author === aiName) {
+                postDiv.classList.add('ai-post');
+            }
+
+            const votesDiv = document.createElement('div');
+            votesDiv.classList.add('votes');
+            votesDiv.innerHTML = `
+                <span class="vote-arrow">▲</span>
+                <span>0</span>
+                <span class="vote-arrow">▼</span>
+            `;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('post-content');
+            
+            const title = author === aiName ? `Respuesta de ${aiName}` : `Nuevo post`;
+
+            contentDiv.innerHTML = `
+                <h3>${title}</h3>
+                <p>${content}</p>
+                <div class="post-meta">Publicado por ${author} hace un momento</div>
+            `;
+
+            postDiv.appendChild(votesDiv);
+            postDiv.appendChild(contentDiv);
+
+            // Añadir al inicio
+            postsContainer.prepend(postDiv);
+            return postDiv; // Devolvemos el elemento para futuras referencias (como el indicador de escritura)
+        }
+        
+        /**
+         * Función principal para enviar un post y manejar la respuesta de la IA
+         */
+        function submitPost() {
+            const postText = postInput.value.trim();
+
+            if (postText === '') {
+                // Si está vacío, solo limpiamos cualquier espacio residual.
+                postInput.value = ''; 
+                return;
+            }
+
+            // 1. Crear el post del usuario
+            createPostElement(postText, userName);
+
+            // 2. Revisar si el usuario le preguntó algo a la IA
+            const aiResponse = checkAI(postText);
+            
+            if (aiResponse) {
+                handleAIResponse(aiResponse);
+            }
+
+            // 3. Limpiar el input
+            postInput.value = '';
+        }
+
+        /**
+         * 2. Manejar la respuesta de la IA con animación de escritura
+         */
+        function handleAIResponse(response) {
+            // Creamos un post temporal para mostrar el indicador de escritura
+            const typingIndicatorPost = createPostElement('Escribiendo', aiName);
+            const contentParagraph = typingIndicatorPost.querySelector('.post-content p');
+            
+            // Reemplazamos el texto 'Escribiendo' con el indicador animado
+            contentParagraph.innerHTML = `
+                ${aiName} está escribiendo<span class="typing-indicator">
+                    <span class="dot1">.</span>
+                    <span class="dot2">.</span>
+                    <span class="dot3">.</span>
+                </span>
+            `;
+
+            // Simular el tiempo que la IA tarda en 'escribir' (1.5 segundos)
+            setTimeout(() => {
+                // Una vez que el tiempo ha pasado, actualizamos el post con la respuesta final
+                const postContentDiv = typingIndicatorPost.querySelector('.post-content');
+                
+                postContentDiv.querySelector('p').innerHTML = response;
+                
+                // Opcional: Podrías querer crear un nuevo post en lugar de actualizar el indicador.
+                // Si quieres que el post 'Escribiendo' desaparezca:
+                // typingIndicatorPost.remove();
+                // createPostElement(response, aiName);
+                
+            }, 1500); // 1500 milisegundos = 1.5 segundos
+        }
+
+
+        // Crear un post inicial de ejemplo
+        createPostElement('¡Bienvenidos al r/Simulacion! Este es un post de ejemplo.', 'Admin');
+    </script>
+
+</body>
+</html>
